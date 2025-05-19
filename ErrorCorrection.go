@@ -14,17 +14,6 @@ func main() {
 		return
 	}
 
-	if args[1] == "-c" {
-		// Criptografy Mode
-		fmt.Println("Criptografy Mode")
-	} else if args[1] == "-d" {
-		// Decriptografy Mode
-		fmt.Println("Decriptografy Mode")
-	} else {
-		fmt.Println("Mode Unwknow")
-		return
-	}
-
 	file, err := os.Open(args[2])
 	if err != nil {
 		fmt.Println("Error opening file: ", err)
@@ -32,17 +21,15 @@ func main() {
 	}
 	defer file.Close()
 
-	buffer := make([]byte, 13)
-
-	for {
-		n, err := file.Read(buffer)
-		if err != nil {
-			if err.Error() != "EOF" {
-				fmt.Println("Error reading file: ", err)
-			}
-			break
-		}
-		fmt.Printf("Read %d bytes: %q\n", n, buffer[:n])
+	if args[1] == "-c" {
+		// Criptografy Mode
+		Cripto(file)
+	} else if args[1] == "-d" {
+		// Decriptografy Mode
+		Decripto(file)
+	} else {
+		fmt.Println("Mode Unwknow")
+		return
 	}
 
 }
