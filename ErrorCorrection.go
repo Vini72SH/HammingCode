@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"os"
 )
 
@@ -33,12 +32,17 @@ func main() {
 	}
 	defer file.Close()
 
-	content, err := io.ReadAll(file)
-	if err != nil {
-		fmt.Println("Error reading file:", err)
-		return
+	buffer := make([]byte, 13)
+
+	for {
+		n, err := file.Read(buffer)
+		if err != nil {
+			if err.Error() != "EOF" {
+				fmt.Println("Error reading file: ", err)
+			}
+			break
+		}
+		fmt.Printf("Read %d bytes: %q\n", n, buffer[:n])
 	}
 
-	fmt.Println("Content:")
-	fmt.Println(string(content))
 }
