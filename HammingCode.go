@@ -9,7 +9,7 @@ func main() {
 	args := os.Args
 
 	if len(args) < 2 {
-		fmt.Println("Use: ./ErrorCorrection -c/-d text.txt")
+		fmt.Println("Use: ./HammingCode -c/-d text.txt")
 
 		return
 	}
@@ -23,10 +23,10 @@ func main() {
 
 	if args[1] == "-c" {
 		// Criptografy Mode
-		Cripto(file)
+		Coder(file)
 	} else if args[1] == "-d" {
 		// Decriptografy Mode
-		Decripto(file)
+		Decoder(file)
 	} else {
 		fmt.Println("Mode Unwknow")
 		return

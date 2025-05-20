@@ -1,1 +1,1 @@
-# Error Correction
+# Hamming Code

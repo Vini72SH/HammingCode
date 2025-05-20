@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func Decripto(file *os.File) int {
+func Decoder(file *os.File) int {
 	fmt.Println("Descriptografia...")
 
 	return 0
