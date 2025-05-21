@@ -70,6 +70,36 @@ func ByteToBin(bt byte) []byte {
 	return binary
 }
 
+func BinToBytes(bins []byte) uint32 {
+	var pow2 uint32
+	var bytes uint32
+
+	bytes = uint32(bins[len(bins)-1])
+
+	pow2 = 2
+	for i := len(bins) - 2; i >= 0; i-- {
+		bytes += uint32(bins[i]) * pow2
+		pow2 = pow2 * 2
+	}
+
+	return bytes
+}
+
+func CalculateParityBits(hammingBlock []byte, hamBlockSize int) {
+	var xor byte = 0
+
+	for i := range hamBlockSize {
+		if hammingBlock[i] == 1 {
+			xor ^= byte(i + 1)
+		}
+	}
+
+	xorBit := ByteToBin(xor)
+	for i := range pow2 {
+		hammingBlock[pow2[i]-1] = xorBit[7-i]
+	}
+}
+
 func HammingCoder(byteGroup []byte, hamBlockSize int) {
 	var j, byteGroupSize int
 	var hammingBlock = make([]byte, 0)
@@ -88,7 +118,9 @@ func HammingCoder(byteGroup []byte, hamBlockSize int) {
 		}
 	}
 
-	fmt.Println(hammingBlock)
+	CalculateParityBits(hammingBlock, hamBlockSize)
+	bytesToWrite := BinToBytes(hammingBlock)
+	fmt.Println(bytesToWrite)
 }
 
 func HammingFunc(buff []byte, size int) {
