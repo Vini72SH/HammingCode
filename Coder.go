@@ -100,16 +100,16 @@ func CalculateParityBits(hammingBlock []byte, hamBlockSize int) {
 	}
 }
 
-func HammingCoder(byteGroup []byte, hamBlockSize int) {
+func HammingCoder(byteGroup []byte) {
 	var j, byteGroupSize int
 	var hammingBlock = make([]byte, 0)
 
 	/*
-	 * Creates a slice of size hamBlockSize and fills in the elements in all fields where the index is not a power of 2.
+	 * Creates a slice of size hammingBits and fills in the elements in all fields where the index is not a power of 2.
 	 */
 	j = 0
 	byteGroupSize = len(byteGroup)
-	for i := range hamBlockSize {
+	for i := range hammingBits {
 		if !(IsPow2(i + 1)) && (j <= byteGroupSize) {
 			hammingBlock = append(hammingBlock, byteGroup[j])
 			j++
@@ -118,7 +118,7 @@ func HammingCoder(byteGroup []byte, hamBlockSize int) {
 		}
 	}
 
-	CalculateParityBits(hammingBlock, hamBlockSize)
+	CalculateParityBits(hammingBlock, hammingBits)
 	bytesToWrite := BinToBytes(hammingBlock)
 	fmt.Println(bytesToWrite)
 }
@@ -127,7 +127,7 @@ func HammingFunc(buff []byte, size int) {
 	var binByte []byte
 	var binaryBlock = make([]byte, 0)
 
-	SetsPow2(31)
+	SetsPow2(hammingBits)
 
 	/*
 	 * Unites all bytes into a block of bits
@@ -140,19 +140,20 @@ func HammingFunc(buff []byte, size int) {
 	/*
 	 * Separates the block into groups of groupSize bits to apply the Hamming code
 	 */
-	groupSize := len(binaryBlock) / 4
+
+	groupSize := dataBits
 	for i := 0; i < len(binaryBlock); i += groupSize {
 		end := i + groupSize
 		group := binaryBlock[i:end]
-		HammingCoder(group, 31)
+		HammingCoder(group)
 	}
 }
 
 func Coder(file *os.File) int {
 	CreateNewFile(file)
 
-	var size int = 13
-	buffer := make([]byte, size)
+	var numberOfBytes int = CalculateNumberOfBits() / 8
+	buffer := make([]byte, numberOfBytes)
 
 	for {
 		_, err := file.Read(buffer)
@@ -164,7 +165,7 @@ func Coder(file *os.File) int {
 		}
 	}
 
-	for i := range size {
+	for i := range numberOfBytes {
 		if i%2 == 0 {
 			buffer[i] = 0b11111111
 		} else {
@@ -172,7 +173,7 @@ func Coder(file *os.File) int {
 		}
 	}
 
-	HammingFunc(buffer, size)
+	HammingFunc(buffer, numberOfBytes)
 
 	return 0
 }

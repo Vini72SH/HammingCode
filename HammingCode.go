@@ -5,12 +5,34 @@ import (
 	"os"
 )
 
+const dataBits int = 26
+const hammingBits int = 31
+
+func CalculateNumberOfBits() int {
+	var r int
+	var dBits = dataBits
+	var hBits = 8 // SizeOfByte
+
+	for hBits != 0 {
+		r = dBits % hBits
+		dBits = hBits
+		hBits = r
+	}
+
+	return dataBits * (8 / dBits)
+}
+
 func main() {
 	args := os.Args
 
 	if len(args) < 2 {
 		fmt.Println("Use: ./HammingCode -c/-d text.txt")
 
+		return
+	}
+
+	if dataBits >= hammingBits {
+		fmt.Println("Invalid Hamming code")
 		return
 	}
 
