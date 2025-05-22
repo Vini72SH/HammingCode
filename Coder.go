@@ -7,14 +7,19 @@ import (
 )
 
 /*
- * Creates an encoded file with the extension .hamming
+ * Creates an coded file with the extension .hamming
  */
-func CreateNewFile(file *os.File) *os.File {
+func CreateCodedFile(file *os.File) *os.File {
 	var name string
 	var newName string
 
 	name = file.Name()
 	parts := strings.Split(name, ".")
+
+	if strings.Compare(parts[1], "txt") != 0 {
+		fmt.Println("The file isn't .txt")
+		return nil
+	}
 
 	newName = parts[0] + ".hamming"
 
@@ -73,7 +78,7 @@ func HammingCoder(byteGroup []byte, codeFile *os.File) {
 	j = 0
 	byteGroupSize = len(byteGroup)
 	for i := range hammingCodeBits {
-		if !(IsPow2(i + 1)) && (j <= byteGroupSize) {
+		if !(IsPow2(i + 1)) && (j < byteGroupSize) {
 			hammingBlock = append(hammingBlock, byteGroup[j])
 			j++
 		} else {
@@ -81,7 +86,6 @@ func HammingCoder(byteGroup []byte, codeFile *os.File) {
 		}
 	}
 	CalculateParityBits(hammingBlock)
-
 	/*
 	 * Writes to the encoded file one group of bits at a time, inserting a space at the end
 	 */
@@ -97,14 +101,14 @@ func HammingCoder(byteGroup []byte, codeFile *os.File) {
 	codeFile.WriteString(" ")
 }
 
-func HammingFunc(buff []byte, size int, codeFile *os.File) {
+func HammingFuncC(buff []byte, size int, codeFile *os.File) {
 	var binaryByte []byte
 	var binaryBlock = make([]byte, 0)
 
 	/*
 	* Unites all bytes into a block of bits
 	 */
-	for i := range buff {
+	for i := range size {
 		binaryByte = ByteToBits(buff[i])
 		binaryBlock = append(binaryBlock, binaryByte...)
 	}
@@ -112,17 +116,19 @@ func HammingFunc(buff []byte, size int, codeFile *os.File) {
 	/*
 	* Separates the block into groups of groupSize bits to apply the Hamming code
 	 */
-
+	var end int
 	groupSize := int(dataBits)
-	for i := 0; i < len(binaryBlock); i += groupSize {
-		end := i + groupSize
+	blockSize := len(binaryBlock)
+	for i := 0; i < blockSize; i += groupSize {
+		end = min(i+groupSize, blockSize)
 		group := binaryBlock[i:end]
 		HammingCoder(group, codeFile)
 	}
+
 }
 
 func Coder(file *os.File) int {
-	newFile := CreateNewFile(file)
+	newFile := CreateCodedFile(file)
 
 	if newFile == nil {
 		return 1
@@ -133,7 +139,7 @@ func Coder(file *os.File) int {
 	buffer := make([]byte, numberOfBytes)
 
 	/*
-	* Dijkstra probably hates me.
+	 * Dijkstra probably hates me.
 	 */
 	for {
 		n, err := file.Read(buffer)
@@ -143,7 +149,7 @@ func Coder(file *os.File) int {
 			}
 			break
 		}
-		HammingFunc(buffer, n, newFile)
+		HammingFuncC(buffer, n, newFile)
 	}
 
 	return 0
