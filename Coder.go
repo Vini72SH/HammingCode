@@ -25,23 +25,24 @@ func CreateNewFile(file *os.File) *os.File {
 /*
  * Defines the set of powers from 2 to max
  */
-func SetsPow2(max int) {
-	var pow int
+func SetsPow2(max byte) {
+	var pow byte
 
 	pow = 1
-	for pow <= max {
+	for pow <= max && pow != 0 {
 		pow2 = append(pow2, byte(pow))
 		pow = pow * 2
 	}
+
 }
 
 /*
  * Returns true if x is a power of 2
  */
-func IsPow2(x int) bool {
+func IsPow2(x byte) bool {
 	var size int = len(pow2)
 	for i := range size {
-		if x == int(pow2[i]) {
+		if x == pow2[i] {
 			return true
 		}
 	}
@@ -52,7 +53,7 @@ func IsPow2(x int) bool {
 /*
  * Returns a bit array equivalent to the value of the byte
  */
-func ByteToBin(bt byte) []byte {
+func ByteToBits(bt byte) []byte {
 	var i int
 	var div, mod, num byte
 	var binary = make([]byte, 8)
@@ -70,7 +71,7 @@ func ByteToBin(bt byte) []byte {
 	return binary
 }
 
-func BinToBytes(bins []byte) uint32 {
+func BitsToBytes(bins []byte) uint32 {
 	var pow2 uint32
 	var bytes uint32
 
@@ -85,16 +86,16 @@ func BinToBytes(bins []byte) uint32 {
 	return bytes
 }
 
-func CalculateParityBits(hammingBlock []byte, hamBlockSize int) {
+func CalculateParityBits(hammingBlock []byte) {
 	var xor byte = 0
 
-	for i := range hamBlockSize {
+	for i := range hammingBits {
 		if hammingBlock[i] == 1 {
 			xor ^= byte(i + 1)
 		}
 	}
 
-	xorBit := ByteToBin(xor)
+	xorBit := ByteToBits(xor)
 	for i := range pow2 {
 		hammingBlock[pow2[i]-1] = xorBit[7-i]
 	}
@@ -118,30 +119,29 @@ func HammingCoder(byteGroup []byte) {
 		}
 	}
 
-	CalculateParityBits(hammingBlock, hammingBits)
-	bytesToWrite := BinToBytes(hammingBlock)
-	fmt.Println(bytesToWrite)
+	CalculateParityBits(hammingBlock)
+	fmt.Println(hammingBlock)
 }
 
 func HammingFunc(buff []byte, size int) {
-	var binByte []byte
+	var binaryByte []byte
 	var binaryBlock = make([]byte, 0)
 
-	SetsPow2(hammingBits)
+	SetsPow2(byte(hammingBits))
 
 	/*
 	 * Unites all bytes into a block of bits
 	 */
 	for i := range buff {
-		binByte = ByteToBin(buff[i])
-		binaryBlock = append(binaryBlock, binByte...)
+		binaryByte = ByteToBits(buff[i])
+		binaryBlock = append(binaryBlock, binaryByte...)
 	}
 
 	/*
 	 * Separates the block into groups of groupSize bits to apply the Hamming code
 	 */
 
-	groupSize := dataBits
+	groupSize := int(dataBits)
 	for i := 0; i < len(binaryBlock); i += groupSize {
 		end := i + groupSize
 		group := binaryBlock[i:end]
@@ -155,6 +155,9 @@ func Coder(file *os.File) int {
 	var numberOfBytes int = CalculateNumberOfBits() / 8
 	buffer := make([]byte, numberOfBytes)
 
+	/*
+	 * Dijkstra probably hates me.
+	 */
 	for {
 		_, err := file.Read(buffer)
 		if err != nil {

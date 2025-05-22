@@ -5,12 +5,12 @@ import (
 	"os"
 )
 
-const dataBits int = 26
-const hammingBits int = 31
+const dataBits byte = 26
+const hammingBits byte = 31
 
 func CalculateNumberOfBits() int {
 	var r int
-	var dBits = dataBits
+	var dBits = int(dataBits)
 	var hBits = 8 // SizeOfByte
 
 	for hBits != 0 {
@@ -19,7 +19,7 @@ func CalculateNumberOfBits() int {
 		hBits = r
 	}
 
-	return dataBits * (8 / dBits)
+	return int(dataBits) * (8 / dBits)
 }
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 		return
 	}
 
-	if dataBits >= hammingBits {
+	if (dataBits >= hammingBits) || (hammingBits-dataBits > 8) {
 		fmt.Println("Invalid Hamming code")
 		return
 	}
