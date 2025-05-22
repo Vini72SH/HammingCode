@@ -46,12 +46,15 @@ func IsPow2(x byte) bool {
 func CalculateNumberOfBits() int {
 	var r int
 	var dBits = int(dataBits)
-	var hBits = 8 // SizeOfByte
+	var bBits = 8 // SizeOfByte
 
-	for hBits != 0 {
-		r = dBits % hBits
-		dBits = hBits
-		hBits = r
+	/*
+	 * Euclidean algorithm
+	 */
+	for bBits != 0 {
+		r = dBits % bBits
+		dBits = bBits
+		bBits = r
 	}
 
 	return int(dataBits) * (8 / dBits)
@@ -61,7 +64,7 @@ func main() {
 	args := os.Args
 
 	if len(args) < 2 {
-		fmt.Println("Use: ./HammingCode -c/-d text.txt")
+		fmt.Println("Use: ./HammingCode -c/-d filename.txt/filename.hamming")
 
 		return
 	}
@@ -81,6 +84,8 @@ func main() {
 	}
 	defer file.Close()
 
+	fmt.Println("Input file: ", file.Name())
+	fmt.Println("Hamming Code Config: ", hammingCodeBits, "/", dataBits)
 	SetsPow2(hammingCodeBits)
 	if args[1] == "-c" {
 		// Criptografy Mode

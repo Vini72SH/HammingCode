@@ -56,30 +56,39 @@ func ByteToBits(bt byte) []byte {
 func CalculateParityBits(hammingBlock []byte) {
 	var xor byte = 0
 
+	/*
+	 * Calculates parity bits with XOR operations
+	 * on indexes where the element is 1
+	 */
 	for i := range hammingCodeBits {
 		if hammingBlock[i] == 1 {
 			xor ^= byte(i + 1)
 		}
 	}
 
+	/*
+	 * Adds the XOR bits in reverse order to
+	 * the positions whose index is a power of 2
+	 */
 	xorBit := ByteToBits(xor)
 	for i := range pow2 {
 		hammingBlock[pow2[i]-1] = xorBit[7-i]
 	}
 }
 
-func HammingCoder(byteGroup []byte, codeFile *os.File) {
-	var j, byteGroupSize int
+func HammingCoder(bitsGroup []byte, codeFile *os.File) {
+	var j, bitsGroupSize int
 	var hammingBlock = make([]byte, 0)
 
 	/*
-	 * Creates a slice of size hammingBits and fills in the elements in all fields where the index is not a power of 2.
+	 * Creates a slice of size hammingCodeBits and fills in the elements
+	 * in all fields where the index is not a power of 2.
 	 */
 	j = 0
-	byteGroupSize = len(byteGroup)
+	bitsGroupSize = len(bitsGroup)
 	for i := range hammingCodeBits {
-		if !(IsPow2(i + 1)) && (j < byteGroupSize) {
-			hammingBlock = append(hammingBlock, byteGroup[j])
+		if !(IsPow2(i + 1)) && (j < bitsGroupSize) {
+			hammingBlock = append(hammingBlock, bitsGroup[j])
 			j++
 		} else {
 			hammingBlock = append(hammingBlock, 0)
@@ -87,7 +96,8 @@ func HammingCoder(byteGroup []byte, codeFile *os.File) {
 	}
 	CalculateParityBits(hammingBlock)
 	/*
-	 * Writes to the encoded file one group of bits at a time, inserting a space at the end
+	 * Writes to the encoded file one bit at a time,
+	 * inserting a space at the end
 	 */
 	for i := range hammingBlock {
 		var bit string
@@ -138,6 +148,8 @@ func Coder(file *os.File) int {
 	var numberOfBytes int = CalculateNumberOfBits() / 8
 	buffer := make([]byte, numberOfBytes)
 
+	fmt.Println("Selected Hamming Coding")
+	fmt.Println("Generating coded file...")
 	/*
 	 * Dijkstra probably hates me.
 	 */
@@ -151,6 +163,8 @@ func Coder(file *os.File) int {
 		}
 		HammingFuncC(buffer, n, newFile)
 	}
+
+	fmt.Println("The coded file is generated:", newFile.Name())
 
 	return 0
 }
