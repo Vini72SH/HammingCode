@@ -51,7 +51,7 @@ func ByteToBits(bt byte) []byte {
 func CalculateParityBits(hammingBlock []byte) {
 	var xor byte = 0
 
-	for i := range hammingBits {
+	for i := range hammingCodeBits {
 		if hammingBlock[i] == 1 {
 			xor ^= byte(i + 1)
 		}
@@ -72,7 +72,7 @@ func HammingCoder(byteGroup []byte, codeFile *os.File) {
 	 */
 	j = 0
 	byteGroupSize = len(byteGroup)
-	for i := range hammingBits {
+	for i := range hammingCodeBits {
 		if !(IsPow2(i + 1)) && (j <= byteGroupSize) {
 			hammingBlock = append(hammingBlock, byteGroup[j])
 			j++
@@ -129,7 +129,6 @@ func Coder(file *os.File) int {
 	}
 	defer newFile.Close()
 
-	SetsPow2(byte(hammingBits))
 	var numberOfBytes int = CalculateNumberOfBits() / 8
 	buffer := make([]byte, numberOfBytes)
 

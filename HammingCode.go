@@ -6,7 +6,7 @@ import (
 )
 
 const dataBits byte = 26
-const hammingBits byte = 31
+const hammingCodeBits byte = 31
 
 var pow2 []byte
 
@@ -69,7 +69,7 @@ func main() {
 	/*
 	 * Hamming code supports at most 8 bits of parity
 	 */
-	if (dataBits >= hammingBits) || (hammingBits-dataBits > 8) {
+	if (dataBits >= hammingCodeBits) || (hammingCodeBits-dataBits > 8) {
 		fmt.Println("Invalid Hamming code")
 		return
 	}
@@ -81,6 +81,7 @@ func main() {
 	}
 	defer file.Close()
 
+	SetsPow2(hammingCodeBits)
 	if args[1] == "-c" {
 		// Criptografy Mode
 		Coder(file)
