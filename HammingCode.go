@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-const dataBits byte = 26
-const hammingCodeBits byte = 31
+const dataBits byte = 247
+const hammingCodeBits byte = 255
 
 var pow2 []byte
 

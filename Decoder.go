@@ -115,19 +115,15 @@ func HammingFuncD(buff []byte, size int, decodeFile *os.File) {
 	}
 
 	/*
-	 * Removes null digits from the last block
+	 * Removes null digits
 	 */
-	if len(binaryBlock)%8 != 0 {
-		finalBytes := make([]byte, 0)
-		for i := range bytesToWrite {
-			if bytesToWrite[i] != 0 {
-				finalBytes = append(finalBytes, bytesToWrite[i])
-			}
+	finalBytes := make([]byte, 0)
+	for i := range bytesToWrite {
+		if bytesToWrite[i] != 0 {
+			finalBytes = append(finalBytes, bytesToWrite[i])
 		}
-		decodeFile.Write(finalBytes)
-		return
 	}
-	decodeFile.Write(bytesToWrite)
+	decodeFile.Write(finalBytes)
 }
 
 func Decoder(file *os.File) int {
@@ -147,7 +143,7 @@ func Decoder(file *os.File) int {
 	var numberOfBytes = numberOfGroups * (1 + int(hammingCodeBits))
 	buffer := make([]byte, numberOfBytes)
 
-	fmt.Println("Selected Hamming Deoding")
+	fmt.Println("Selected Hamming Decoding")
 	fmt.Println("Generating decoded file...")
 	/*
 	 * Dijkstra probably hates me.
