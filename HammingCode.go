@@ -1,12 +1,13 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 )
 
-const dataBits byte = 247
-const hammingCodeBits byte = 255
+const dataBits byte = 26
+const hammingCodeBits byte = 31
 
 var pow2 []byte
 
@@ -61,13 +62,13 @@ func CalculateNumberOfBits() int {
 }
 
 func main() {
-	args := os.Args
+	var encodeFile string
+	var decodeFile string
 
-	if len(args) < 2 {
-		fmt.Println("Use: ./HammingCode -c/-d filename.txt/filename.hamming")
+	flag.StringVar(&encodeFile, "c", "", "file to encode")
+	flag.StringVar(&decodeFile, "d", "", "file to decode")
 
-		return
-	}
+	flag.Parse()
 
 	/*
 	 * Hamming code supports at most 8 bits of parity
@@ -77,25 +78,31 @@ func main() {
 		return
 	}
 
-	file, err := os.Open(args[2])
-	if err != nil {
-		fmt.Println("Error opening file: ", err)
-		return
-	}
-	defer file.Close()
-
-	fmt.Println("Input file: ", file.Name())
 	fmt.Println("Hamming Code Config: ", hammingCodeBits, "/", dataBits)
 	SetsPow2(hammingCodeBits)
-	if args[1] == "-c" {
-		// Criptografy Mode
-		Coder(file)
-	} else if args[1] == "-d" {
-		// Decriptografy Mode
-		Decoder(file)
-	} else {
-		fmt.Println("Mode Unwknow")
+
+	if encodeFile != "" && decodeFile != "" {
+		fmt.Println("Cannot decode and encode at the same time!")
 		return
 	}
 
+	if encodeFile != "" {
+		file, err := os.Open(encodeFile)
+		if err != nil {
+			fmt.Println("Error opening file: ", err)
+			return
+		}
+		defer file.Close()
+		Coder(file)
+	} else if decodeFile != "" {
+		file, err := os.Open(decodeFile)
+		if err != nil {
+			fmt.Println("Error opening file: ", err)
+			return
+		}
+		defer file.Close()
+		Decoder(file)
+	} else {
+		fmt.Println("Unknown mode")
+	}
 }

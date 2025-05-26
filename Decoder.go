@@ -108,22 +108,18 @@ func HammingFuncD(buff []byte, size int, decodeFile *os.File) {
 	 * Converts the block of bits into a array of bytes
 	 * to write to the file
 	 */
+	var n int = 0
 	for i := range totalBytes {
 		start := i * 8
 		end := start + 8
-		bytesToWrite[i] = BitsToByte(binaryBlock[start:end])
-	}
-
-	/*
-	 * Removes null digits
-	 */
-	finalBytes := make([]byte, 0)
-	for i := range bytesToWrite {
-		if bytesToWrite[i] != 0 {
-			finalBytes = append(finalBytes, bytesToWrite[i])
+		currentByte := BitsToByte(binaryBlock[start:end])
+		if currentByte != 0 {
+			bytesToWrite[n] = currentByte
+			n++
 		}
 	}
-	decodeFile.Write(finalBytes)
+
+	decodeFile.Write(bytesToWrite[0:n])
 }
 
 func Decoder(file *os.File) int {
