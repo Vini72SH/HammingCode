@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
@@ -16,10 +17,10 @@ func CreateCodedFile(file *os.File) *os.File {
 	name = file.Name()
 	parts := strings.Split(name, ".")
 
-	if strings.Compare(parts[1], "txt") != 0 {
+	/*if strings.Compare(parts[1], "txt") != 0 {
 		fmt.Println("The file isn't .txt")
 		return nil
-	}
+	}*/
 
 	newName = parts[0] + ".hamming"
 
@@ -76,7 +77,7 @@ func CalculateParityBits(hammingBlock []byte) {
 	}
 }
 
-func HammingCoder(bitsGroup []byte, codeFile *os.File) {
+func HammingCoder(bitsGroup []byte, codeFile *bufio.Writer) {
 	var j, bitsGroupSize int
 	var hammingBlock = make([]byte, 0)
 
@@ -111,7 +112,7 @@ func HammingCoder(bitsGroup []byte, codeFile *os.File) {
 	codeFile.WriteString(" ")
 }
 
-func HammingFuncC(buff []byte, size int, codeFile *os.File) {
+func HammingFuncC(buff []byte, size int, codeFile *bufio.Writer) {
 	var binaryByte []byte
 	var binaryBlock = make([]byte, 0)
 
@@ -153,16 +154,20 @@ func Coder(file *os.File) int {
 	/*
 	 * Dijkstra probably hates me.
 	 */
+
+	reader := bufio.NewReader(file)
+	writer := bufio.NewWriter(newFile)
 	for {
-		n, err := file.Read(buffer)
+		n, err := reader.Read(buffer)
 		if err != nil {
 			if err.Error() != "EOF" {
 				fmt.Println("Error")
 			}
 			break
 		}
-		HammingFuncC(buffer, n, newFile)
+		HammingFuncC(buffer, n, writer)
 	}
+	writer.Flush()
 
 	fmt.Println("The coded file is generated:", newFile.Name())
 

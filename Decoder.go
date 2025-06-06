@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strings"
@@ -64,7 +65,7 @@ func HammingDecoder(byteGroup []byte) {
 	}
 }
 
-func HammingFuncD(buff []byte, size int, decodeFile *os.File) {
+func HammingFuncD(buff []byte, size int, decodeFile *bufio.Writer) {
 	var end int
 	var binaryBlock []byte = make([]byte, 0)
 	var hammingBlock []byte = make([]byte, 0)
@@ -144,16 +145,20 @@ func Decoder(file *os.File) int {
 	/*
 	 * Dijkstra probably hates me.
 	 */
+
+	reader := bufio.NewReader(file)
+	writer := bufio.NewWriter(newFile)
 	for {
-		n, err := file.Read(buffer)
+		n, err := reader.Read(buffer)
 		if err != nil {
 			if err.Error() != "EOF" {
 				fmt.Println("Error")
 			}
 			break
 		}
-		HammingFuncD(buffer, n, newFile)
+		HammingFuncD(buffer, n, writer)
 	}
+	writer.Flush()
 
 	fmt.Println("The decoded file is generated:", newFile.Name())
 
