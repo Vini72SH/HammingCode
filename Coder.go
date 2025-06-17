@@ -17,10 +17,10 @@ func CreateCodedFile(file *os.File) *os.File {
 	name = file.Name()
 	parts := strings.Split(name, ".")
 
-	/*if strings.Compare(parts[1], "txt") != 0 {
+	if strings.Compare(parts[1], "txt") != 0 {
 		fmt.Println("The file isn't .txt")
 		return nil
-	}*/
+	}
 
 	newName = parts[0] + ".hamming"
 
