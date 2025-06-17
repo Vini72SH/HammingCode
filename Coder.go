@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"strings"
@@ -77,7 +76,7 @@ func CalculateParityBits(hammingBlock []byte) {
 	}
 }
 
-func HammingCoder(bitsGroup []byte, codeFile *bufio.Writer) {
+func HammingCoder(bitsGroup []byte, codeFile *os.File) {
 	var j, bitsGroupSize int
 	var hammingBlock = make([]byte, 0)
 
@@ -112,7 +111,7 @@ func HammingCoder(bitsGroup []byte, codeFile *bufio.Writer) {
 	codeFile.WriteString(" ")
 }
 
-func HammingFuncC(buff []byte, size int, codeFile *bufio.Writer) {
+func HammingFuncC(buff []byte, size int, codeFile *os.File) {
 	var binaryByte []byte
 	var binaryBlock = make([]byte, 0)
 
@@ -155,19 +154,16 @@ func Coder(file *os.File) int {
 	 * Dijkstra probably hates me.
 	 */
 
-	reader := bufio.NewReader(file)
-	writer := bufio.NewWriter(newFile)
 	for {
-		n, err := reader.Read(buffer)
+		n, err := file.Read(buffer)
 		if err != nil {
 			if err.Error() != "EOF" {
 				fmt.Println("Error")
 			}
 			break
 		}
-		HammingFuncC(buffer, n, writer)
+		HammingFuncC(buffer, n, newFile)
 	}
-	writer.Flush()
 
 	fmt.Println("The coded file is generated:", newFile.Name())
 
